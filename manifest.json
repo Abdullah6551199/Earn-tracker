@@ -1,0 +1,16 @@
+{
+  "name": "EarnTrack Calculator",
+  "short_name": "EarnTrack",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#D70F64",
+  "description": "Track your hourly and order-based earnings.",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>",
+      "sizes": "100x100",
+      "type": "image/svg+xml"
+    }
+  ]
+}

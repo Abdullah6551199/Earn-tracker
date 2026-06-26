@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnTrack</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Theme color -->
+    <meta name="theme-color" content="#D70F64">
+    
+    <!-- iOS meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EarnTrack">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+
+    <style>
+        /* === آپ کا پورا CSS === */
+        :root{
+            --primary:#D70F64;
+            --primary-dark:#B50C52;
+            --bg:#f6f7fb;
+            --card:#ffffff;
+            --text:#222;
+        }
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+        body{ background:var(--bg); padding:15px; }
+        .container{ max-width:600px; margin:auto; }
+        .card{ background:var(--card); border-radius:18px; padding:18px; box-shadow:0 8px 25px rgba(0,0,0,.08); margin-bottom:15px; }
+        h1{ text-align:center; color:var(--primary); margin-bottom:15px; }
+        .row{ display:flex; gap:10px; }
+        .field{ flex:1; }
+        label{ display:block; font-size:13px; margin-bottom:6px; color:#555; font-weight:bold; }
+        input{ width:100%; height:48px; border:2px solid #ececec; border-radius:12px; padding:10px; font-size:16px; outline:none; }
+        input:focus{ border-color:var(--primary); }
+        .tip-field{ margin-top:10px; }
+        .result{ text-align:center; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; margin-top:15px; }
+        .result h2{ font-size:14px; opacity:.9; margin-bottom:8px; }
+        .total{ font-size:38px; font-weight:bold; }
+        .sub{ margin-top:8px; font-size:13px; opacity:.9; }
+        .btns{ display:flex; gap:10px; margin-top:15px; }
+        button{ flex:1; height:48px; border:none; border-radius:12px; cursor:pointer; font-weight:bold; }
+        .save{ background:var(--primary); color:white; }
+        .clear{ background:#eee; }
+        .stats{ text-align:center; }
+        .stats-number{ font-size:32px; font-weight:bold; color:var(--primary); }
+        .history-title{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        .small-btn{ background:red; color:white; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+        .entry{ border:1px solid #eee; border-radius:12px; padding:12px; margin-bottom:10px; }
+        .entry-top{ display:flex; justify-content:space-between; margin-bottom:6px; }
+        .date{ color:#777; font-size:12px; }
+        .amount{ color:var(--primary); font-weight:bold; }
+        .delete{ background:#ff4d4f; color:white; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; margin-top:8px; }
+        .empty{ text-align:center; color:#888; padding:20px; }
+        @media(max-width:500px){ .total{ font-size:30px; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>EarnTrack</h1>
+        <div class="card result" style="margin-top:0;">
+            <h2>Total Earnings</h2>
+            <div class="total" id="total">0 PKR</div>
+            <div class="sub">160 PKR/Hour • 80 PKR/Order</div>
+        </div>
+        <div class="row">
+            <div class="field"><label>Hours</label><input type="number" id="hours"></div>
+            <div class="field"><label>Minutes</label><input type="number" id="minutes"></div>
+            <div class="field"><label>Orders</label><input type="number" id="orders"></div>
+        </div>
+        <div class="tip-field"><label>Tip (Optional)</label><input type="number" id="tip"></div>
+        <div class="btns">
+            <button class="save" onclick="saveEntry()">Save Entry</button>
+            <button class="clear" onclick="resetFields()">Reset</button>
+        </div>
+    </div>
+    <div class="card stats">
+        <div>Total Saved Earnings</div>
+        <div class="stats-number" id="lifetime">0 PKR</div>
+    </div>
+    <div class="card">
+        <div class="history-title"><h3>History</h3><button class="small-btn" onclick="clearHistory()">Clear All</button></div>
+        <div id="history"></div>
+    </div>
+</div>
+
+<script>
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker Registered'))
+            .catch(err => console.log('SW registration failed', err));
+    }
+
+    // === آپ کا اصل JavaScript ===
+    const HOURLY_RATE = 160;
+    const ORDER_RATE = 80;
+    const hours = document.getElementById("hours");
+    const minutes = document.getElementById("minutes");
+    const orders = document.getElementById("orders");
+    const tip = document.getElementById("tip");
+    const totalBox = document.getElementById("total");
+
+    [hours,minutes,orders,tip].forEach(el=> el.addEventListener("input",calculate));
+
+    function calculate(){
+        const h = parseFloat(hours.value)||0;
+        const m = parseFloat(minutes.value)||0;
+        const o = parseFloat(orders.value)||0;
+        const t = parseFloat(tip.value)||0;
+        const totalHours = h + (m/60);
+        const total = (totalHours*HOURLY_RATE) + (o*ORDER_RATE) + t;
+        totalBox.innerText = Math.round(total).toLocaleString() + " PKR";
+        return Math.round(total);
+    }
+
+    function saveEntry(){
+        const total = calculate();
+        if(total<=0){ alert("Enter values first"); return; }
+        const record = {
+            date:new Date().toLocaleString(),
+            hours:hours.value || "",
+            minutes:minutes.value || "",
+            orders:orders.value || "",
+            tip:tip.value || "",
+            total:total
+        };
+        let history = JSON.parse(localStorage.getItem("earntrack_history")) || [];
+        history.unshift(record);
+        localStorage.setItem("earntrack_history", JSON.stringify(history));
+        loadHistory();
+    }
+
+    function loadHistory(){
+        const historyDiv = document.getElementById("history");
+        let history = JSON.parse(localStorage.getItem("earntrack_history")) || [];
+        historyDiv.innerHTML = "";
+        let lifetime = 0;
+        if(history.length===0){
+            historyDiv.innerHTML = '<div class="empty">No history yet</div>';
+            document.getElementById("lifetime").innerText = "0 PKR";
+            return;
+        }
+        history.forEach((item,index)=>{
+            lifetime += Number(item.total);
+            historyDiv.innerHTML += `
+            <div class="entry">
+                <div class="entry-top">
+                    <div class="date">${item.date}</div>
+                    <div class="amount">${item.total.toLocaleString()} PKR</div>
+                </div>
+                <div>${item.hours}h ${item.minutes}m | ${item.orders} Orders | Tip: ${item.tip || 0}</div>
+                <button class="delete" onclick="deleteEntry(${index})">Delete</button>
+            </div>`;
+        });
+        document.getElementById("lifetime").innerText = lifetime.toLocaleString() + " PKR";
+    }
+
+    function deleteEntry(index){
+        let history = JSON.parse(localStorage.getItem("earntrack_history")) || [];
+        history.splice(index,1);
+        localStorage.setItem("earntrack_history", JSON.stringify(history));
+        loadHistory();
+    }
+
+    function clearHistory(){
+        if(confirm("Delete all history?")){
+            localStorage.removeItem("earntrack_history");
+            loadHistory();
+        }
+    }
+
+    function resetFields(){
+        hours.value="";
+        minutes.value="";
+        orders.value="";
+        tip.value="";
+        calculate();
+    }
+
+    calculate();
+    loadHistory();
+</script>
+
+</body>
+</html>
