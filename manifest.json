@@ -1,0 +1,18 @@
+{
+  "name": "EarnTrack - Earnings Tracker",
+  "short_name": "EarnTrack",
+  "description": "Track your hourly earnings and orders easily.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f0f2f8",
+  "theme_color": "#D70F64",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

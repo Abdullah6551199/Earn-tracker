@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnTrack • Track Your Earnings</title>
+
+    <style>
+        :root {
+            --primary: #D70F64;
+            --primary-light: #ff4088;
+            --primary-dark: #9b0a45;
+            --primary-glow: rgba(215, 15, 100, 0.3);
+            --accent: #ff9f43;
+            --accent-light: #ffbe76;
+            --bg: #f0f2f8;
+            --bg-secondary: #e8eaf0;
+            --card: #ffffff;
+            --card-glass: rgba(255, 255, 255, 0.75);
+            --text: #1a1a2e;
+            --text-secondary: #5a5a7a;
+            --text-muted: #8a8aa0;
+            --border: #e2e4ed;
+            --border-light: #f0f1f6;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 8px 35px rgba(215, 15, 100, 0.2);
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #10b981;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --overlay: rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --card: #1e1e32;
+            --card-glass: rgba(30, 30, 50, 0.8);
+            --text: #e8e8f0;
+            --text-secondary: #b0b0c8;
+            --text-muted: #7a7a98;
+            --border: #2a2a44;
+            --border-light: #252540;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 8px 40px rgba(215, 15, 100, 0.35);
+            --danger-light: #3b1018;
+            --overlay: rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(215, 15, 100, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 90%, rgba(255, 159, 67, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(100, 100, 200, 0.03) 0%, transparent 70%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 12px;
+            transition: background var(--transition-slow), color var(--transition-slow);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding-bottom: 30px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 4px;
+            gap: 12px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            box-shadow: var(--shadow-glow);
+            flex-shrink: 0;
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--card);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+            color: var(--text-secondary);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+        .icon-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        .icon-btn:active {
+            transform: scale(0.94);
+            transition: 0.1s;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: linear-gradient(145deg, #c90858, #9b0a45, #7a0636);
+            color: #fff;
+            text-align: center;
+            border: none;
+            box-shadow: var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+            animation: shimmer 4s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        .result-card::after {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 70% 80%, rgba(255, 159, 67, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .result-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.85;
+            margin-bottom: 6px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        .total-amount {
+            font-size: 50px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s;
+            word-break: break-all;
+        }
+        .rate-info {
+            margin-top: 10px;
+            font-size: 13px;
+            opacity: 0.85;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .rate-badge {
+            background: rgba(255, 255, 255, 0.18);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+            font-size: 12px;
+        }
+
+        /* Input Section */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 420px) {
+            .input-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .total-amount {
+                font-size: 38px;
+            }
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .field label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .field label .icon {
+            font-size: 14px;
+        }
+        .field input {
+            width: 100%;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0 14px;
+            font-size: 16px;
+            font-weight: 600;
+            background: var(--bg-secondary);
+            color: var(--text);
+            outline: none;
+            transition: all var(--transition);
+            letter-spacing: 0.3px;
+        }
+        .field input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+            background: var(--card);
+        }
+        .field input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 14px;
+        }
+        .tip-row {
+            margin-top: 8px;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        button {
+            height: 48px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 0 16px;
+        }
+        button:active {
+            transform: scale(0.96);
+            transition: 0.1s;
+        }
+        .btn-save {
+            flex: 1.4;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(215, 15, 100, 0.35);
+            font-size: 16px;
+        }
+        .btn-save:hover {
+            box-shadow: 0 8px 28px rgba(215, 15, 100, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn-reset {
+            flex: 0.8;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+            font-weight: 600;
+        }
+        .btn-reset:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(215, 15, 100, 0.03);
+        }
+        .btn-danger-text {
+            background: transparent;
+            color: var(--danger);
+            font-weight: 600;
+            font-size: 13px;
+            height: auto;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+        .btn-danger-text:hover {
+            background: var(--danger-light);
+            border-color: var(--danger);
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 380px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .stat-box {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px 12px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+            cursor: default;
+        }
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+        .stat-icon {
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+            font-weight: 600;
+        }
+
+        /* History */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .history-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+        .entry {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-light);
+            transition: all var(--transition);
+            animation: fadeSlideIn 0.35s ease-out;
+            position: relative;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .entry:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .entry-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .entry-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .entry-amount {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--primary);
+            letter-spacing: -0.3px;
+        }
+        .entry-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .entry-detail-chip {
+            background: var(--card);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .entry-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .btn-entry-action {
+            padding: 7px 13px;
+            font-size: 12px;
+            border-radius: 20px;
+            height: auto;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .btn-entry-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(215, 15, 100, 0.03);
+        }
+        .btn-entry-delete {
+            color: var(--danger);
+            border-color: transparent;
+            background: transparent;
+        }
+        .btn-entry-delete:hover {
+            background: var(--danger-light);
+            border-color: var(--danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-icon {
+            font-size: 56px;
+            margin-bottom: 14px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+        .empty-state p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Modal / Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 999;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 90vw;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            background: #059669;
+        }
+        .toast.error {
+            background: #dc2626;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn 0.25s ease-out;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .modal h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .modal p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+        }
+        .modal .btn-row {
+            margin-top: 0;
+        }
+
+        /* Pulse dot */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+            margin-right: 4px;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        /* Utility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+        .highlight {
+            animation: highlightPop 0.5s ease-out;
+        }
+        @keyframes highlightPop {
+            0% {
+                transform: scale(1);
+            }
+            40% {
+                transform: scale(1.04);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">💰</div>
+                <span class="logo-text">EarnTrack</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="btnExport" title="Export CSV" aria-label="Export data">📥</button>
+                <button class="icon-btn" id="btnTheme" title="Toggle Dark Mode" aria-label="Toggle theme">🌓</button>
+            </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="card result-card" id="resultCard">
+            <div class="result-label">💎 Current Session Earnings</div>
+            <div class="total-amount" id="total">0 PKR</div>
+            <div class="rate-info">
+                <span class="rate-badge">⏱ 160 PKR / Hour</span>
+                <span class="rate-badge">📦 80 PKR / Order</span>
+            </div>
+        </div>
+
+        <!-- Input Card -->
+        <div class="card">
+            <div class="input-grid">
+                <div class="field">
+                    <label><span class="icon">⏱️</span> Hours</label>
+                    <input type="number" id="hours" placeholder="0" min="0" step="0.5" inputmode="decimal">
+                </div>
+                <div class="field">
+                    <label><span class="icon">🕐</span> Minutes</label>
+                    <input type="number" id="minutes" placeholder="0" min="0" max="59" step="1" inputmode="numeric">
+                </div>
+                <div class="field">
+                    <label><span class="icon">📦</span> Orders</label>
+                    <input type="number" id="orders" placeholder="0" min="0" step="1" inputmode="numeric">
+                </div>
+            </div>
+            <div class="field tip-row">
+                <label><span class="icon">🎁</span> Tip (Optional)</label>
+                <input type="number" id="tip" placeholder="0" min="0" step="1" inputmode="numeric">
+            </div>
+            <div class="btn-row">
+                <button class="btn-save" id="btnSave">💾 Save Entry</button>
+                <button class="btn-reset" id="btnReset">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" id="lifetime">0 PKR</div>
+                <div class="stat-label">Lifetime Earnings</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value" id="totalEntries">0</div>
+                <div class="stat-label">Total Entries</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">📦</div>
+                <div class="stat-value" id="totalOrdersStat">0</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+        </div>
+
+        <!-- History Card -->
+        <div class="card">
+            <div class="history-header">
+                <h3><span class="pulse-dot"></span> History</h3>
+                <button class="btn-danger-text" id="btnClearAll">🗑 Clear All</button>
+            </div>
+            <div id="history"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Hidden Modal Container -->
+    <div id="modalContainer"></div>
+
+    <script>
+        (function() {
+            // ──────────────────────────────────────
+            // Constants & State
+            // ──────────────────────────────────────
+            const HOURLY_RATE = 160;
+            const ORDER_RATE = 80;
+            const STORAGE_KEY = 'earntrack_history';
+
+            // DOM refs
+            const $hours = document.getElementById('hours');
+            const $minutes = document.getElementById('minutes');
+            const $orders = document.getElementById('orders');
+            const $tip = document.getElementById('tip');
+            const $total = document.getElementById('total');
+            const $resultCard = document.getElementById('resultCard');
+            const $history = document.getElementById('history');
+            const $lifetime = document.getElementById('lifetime');
+            const $totalEntries = document.getElementById('totalEntries');
+            const $totalOrdersStat = document.getElementById('totalOrdersStat');
+            const $toast = document.getElementById('toast');
+            const $modalContainer = document.getElementById('modalContainer');
+            const $btnSave = document.getElementById('btnSave');
+            const $btnReset = document.getElementById('btnReset');
+            const $btnClearAll = document.getElementById('btnClearAll');
+            const $btnTheme = document.getElementById('btnTheme');
+            const $btnExport = document.getElementById('btnExport');
+
+            let toastTimer = null;
+            let editIndex = null; // if editing, holds the index
+
+            // ──────────────────────────────────────
+            // Theme
+            // ──────────────────────────────────────
+            function initTheme() {
+                const saved = localStorage.getItem('earntrack_theme') || 'light';
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('earntrack_theme', next);
+                showToast('🎨 Theme switched to ' + (next === 'dark' ? 'Dark' : 'Light') + ' mode',
+                'success');
+            }
+
+            // ──────────────────────────────────────
+            // Toast
+            // ──────────────────────────────────────
+            function showToast(msg, type = '') {
+                if (toastTimer) clearTimeout(toastTimer);
+                $toast.textContent = msg;
+                $toast.className = 'toast ' + type + ' show';
+                toastTimer = setTimeout(() => {
+                    $toast.classList.remove('show');
+                }, 2200);
+            }
+
+            // ──────────────────────────────────────
+            // Modal
+            // ──────────────────────────────────────
+            function showModal(title, message, onConfirm) {
+                const html = `
+                <div class="modal-overlay" id="modalOverlay">
+                    <div class="modal">
+                        <h3>${title}</h3>
+                        <p>${message}</p>
+                        <div class="btn-row">
+                            <button class="btn-outline" id="modalCancel" style="flex:1;">Cancel</button>
+                            <button class="btn-save" id="modalConfirm" style="flex:1; background:#ef4444;">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+                $modalContainer.innerHTML = html;
+
+                const overlay = document.getElementById('modalOverlay');
+                const btnCancel = document.getElementById('modalCancel');
+                const btnConfirm = document.getElementById('modalConfirm');
+
+                const close = () => { $modalContainer.innerHTML = ''; };
+
+                btnCancel.addEventListener('click', close);
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) close();
+                });
+                btnConfirm.addEventListener('click', () => {
+                    close();
+                    if (typeof onConfirm === 'function') onConfirm();
+                });
+
+                // ESC key
+                const escHandler = (e) => {
+                    if (e.key === 'Escape') { close();
+                        document.removeEventListener('keydown', escHandler); }
+                };
+                document.addEventListener('keydown', escHandler);
+            }
+
+            // ──────────────────────────────────────
+            // Calculation
+            // ──────────────────────────────────────
+            function calculate() {
+                const h = parseFloat($hours.value) || 0;
+                const m = parseFloat($minutes.value) || 0;
+                const o = parseFloat($orders.value) || 0;
+                const t = parseFloat($tip.value) || 0;
+
+                const totalHours = h + (m / 60);
+                const total = (totalHours * HOURLY_RATE) + (o * ORDER_RATE) + t;
+
+                const rounded = Math.round(total);
+                $total.textContent = rounded.toLocaleString() + ' PKR';
+
+                // Animate
+                $resultCard.classList.remove('highlight');
+                void $resultCard.offsetWidth;
+                $resultCard.classList.add('highlight');
+
+                return rounded;
+            }
+
+            function resetFields() {
+                $hours.value = '';
+                $minutes.value = '';
+                $orders.value = '';
+                $tip.value = '';
+                editIndex = null;
+                $btnSave.textContent = '💾 Save Entry';
+                $btnSave.style.background = '';
+                calculate();
+                showToast('🔄 Fields reset', '');
+            }
+
+            // ──────────────────────────────────────
+            // History CRUD
+            // ──────────────────────────────────────
+            function getHistory() {
+                try {
+                    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            function saveHistory(arr) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+            }
+
+            function saveEntry() {
+                const total = calculate();
+                if (total <= 0) {
+                    showToast('⚠️ Please enter some values first', 'error');
+                    // shake the result card
+                    $resultCard.style.animation = 'none';
+                    void $resultCard.offsetWidth;
+                    $resultCard.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => { $resultCard.style.animation = ''; }, 500);
+                    return;
+                }
+
+                const record = {
+                    date: new Date().toISOString(),
+                    hours: $hours.value || '0',
+                    minutes: $minutes.value || '0',
+                    orders: $orders.value || '0',
+                    tip: $tip.value || '0',
+                    total: total,
+                };
+
+                let history = getHistory();
+
+                if (editIndex !== null && editIndex >= 0 && editIndex < history.length) {
+                    // Update existing
+                    history[editIndex] = { ...history[editIndex], ...record, date: history[editIndex].date };
+                    showToast('✅ Entry updated!', 'success');
+                    editIndex = null;
+                    $btnSave.textContent = '💾 Save Entry';
+                    $btnSave.style.background = '';
+                } else {
+                    // New entry
+                    history.unshift(record);
+                    showToast('✅ Entry saved!', 'success');
+                }
+
+                saveHistory(history);
+                resetFields();
+                loadHistory();
+            }
+
+            function deleteEntry(index) {
+                showModal('Delete Entry', 'Are you sure you want to delete this entry? This action cannot be undone.',
+                    () => {
+                        let history = getHistory();
+                        if (index >= 0 && index < history.length) {
+                            history.splice(index, 1);
+                            saveHistory(history);
+                            loadHistory();
+                            if (editIndex === index) {
+                                editIndex = null;
+                                $btnSave.textContent = '💾 Save Entry';
+                                $btnSave.style.background = '';
+                            }
+                            showToast('🗑 Entry deleted', 'error');
+                        }
+                    });
+            }
+
+            function startEdit(index) {
+                let history = getHistory();
+                if (index < 0 || index >= history.length) return;
+                const item = history[index];
+                $hours.value = item.hours === '0' ? '' : item.hours;
+                $minutes.value = item.minutes === '0' ? '' : item.minutes;
+                $orders.value = item.orders === '0' ? '' : item.orders;
+                $tip.value = item.tip === '0' ? '' : item.tip;
+                editIndex = index;
+                $btnSave.textContent = '✏️ Update Entry';
+                $btnSave.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                calculate();
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showToast('📝 Editing entry... Make changes and click Update', '');
+            }
+
+            function clearAllHistory() {
+                const history = getHistory();
+                if (history.length === 0) {
+                    showToast('📭 No history to clear', '');
+                    return;
+                }
+                showModal('Clear All History',
+                    `You are about to delete <strong>${history.length} entry(s)</strong>. This cannot be undone.`,
+                    () => {
+                        localStorage.removeItem(STORAGE_KEY);
+                        editIndex = null;
+                        $btnSave.textContent = '💾 Save Entry';
+                        $btnSave.style.background = '';
+                        loadHistory();
+                        resetFields();
+                        showToast('🗑 All history cleared', 'error');
+                    });
+            }
+
+            // ──────────────────────────────────────
+            // Export CSV
+            // ──────────────────────────────────────
+            function exportCSV() {
+                const history = getHistory();
+                if (history.length === 0) {
+                    showToast('📭 Nothing to export', 'error');
+                    return;
+                }
+                let csv = 'Date,Hours,Minutes,Orders,Tip,Total (PKR)\n';
+                history.forEach(item => {
+                    const d = new Date(item.date);
+                    const dateStr = d.toLocaleDateString('en-PK') + ' ' + d.toLocaleTimeString('en-PK', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    csv +=
+                        `"${dateStr}",${item.hours},${item.minutes},${item.orders},${item.tip},${item.total}\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'earntrack_export_' + new Date().toISOString().slice(0, 10) + '.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showToast('📥 CSV exported!', 'success');
+            }
+
+            // ──────────────────────────────────────
+            // Load & Render History
+            // ──────────────────────────────────────
+            function loadHistory() {
+                const history = getHistory();
+                $history.innerHTML = '';
+
+                let lifetimeTotal = 0;
+                let totalOrdersAll = 0;
+
+                if (history.length === 0) {
+                    $history.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>No entries yet</p>
+                        <p style="font-size:12px;margin-top:4px;">Start by adding hours &amp; orders above!</p>
+                    </div>`;
+                    $lifetime.textContent = '0 PKR';
+                    $totalEntries.textContent = '0';
+                    $totalOrdersStat.textContent = '0';
+                    return;
+                }
+
+                history.forEach((item, index) => {
+                    lifetimeTotal += Number(item.total);
+                    totalOrdersAll += Number(item.orders) || 0;
+
+                    const d = new Date(item.date);
+                    const dateStr = d.toLocaleDateString('en-PK', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                    const timeStr = d.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' });
+
+                    const entryEl = document.createElement('div');
+                    entryEl.className = 'entry';
+                    entryEl.innerHTML = `
+                    <div class="entry-top">
+                        <span class="entry-date">📅 ${dateStr} · ${timeStr}</span>
+                        <span class="entry-amount">${item.total.toLocaleString()} PKR</span>
+                    </div>
+                    <div class="entry-details">
+                        <span class="entry-detail-chip">⏱ ${item.hours}h ${item.minutes}m</span>
+                        <span class="entry-detail-chip">📦 ${item.orders} Orders</span>
+                        <span class="entry-detail-chip">🎁 Tip: ${item.tip || 0}</span>
+                    </div>
+                    <div class="entry-actions">
+                        <button class="btn-entry-action" data-edit="${index}">✏️ Edit</button>
+                        <button class="btn-entry-delete" data-delete="${index}">🗑 Delete</button>
+                    </div>
+                    `;
+                    $history.appendChild(entryEl);
+                });
+
+                // Attach event listeners
+                $history.querySelectorAll('[data-edit]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        startEdit(parseInt(this.getAttribute('data-edit')));
+                    });
+                });
+                $history.querySelectorAll('[data-delete]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        deleteEntry(parseInt(this.getAttribute('data-delete')));
+                    });
+                });
+
+                $lifetime.textContent = lifetimeTotal.toLocaleString() + ' PKR';
+                $totalEntries.textContent = history.length.toLocaleString();
+                $totalOrdersStat.textContent = totalOrdersAll.toLocaleString();
+            }
+
+            // ──────────────────────────────────────
+            // Keyboard shortcut for Save (Ctrl+Enter)
+            // ──────────────────────────────────────
+            function handleKeyboard(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    saveEntry();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                    e.preventDefault();
+                    resetFields();
+                }
+            }
+
+            // ──────────────────────────────────────
+            // Event Listeners
+            // ──────────────────────────────────────
+            [$hours, $minutes, $orders, $tip].forEach(el => {
+                el.addEventListener('input', calculate);
+                el.addEventListener('keydown', handleKeyboard);
+            });
+
+            $btnSave.addEventListener('click', saveEntry);
+            $btnReset.addEventListener('click', resetFields);
+            $btnClearAll.addEventListener('click', clearAllHistory);
+            $btnTheme.addEventListener('click', toggleTheme);
+            $btnExport.addEventListener('click', exportCSV);
+
+            // ──────────────────────────────────────
+            // Add shake animation
+            // ──────────────────────────────────────
+            const shakeStyle = document.createElement('style');
+            shakeStyle.textContent = `
+            @keyframes shake {
+                0%,100% { transform: translateX(0); }
+                20% { transform: translateX(-8px); }
+                40% { transform: translateX(8px); }
+                60% { transform: translateX(-5px); }
+                80% { transform: translateX(5px); }
+            }
+            `;
+            document.head.appendChild(shakeStyle);
+
+            // ──────────────────────────────────────
+            // Init
+            // ──────────────────────────────────────
+            function init() {
+                initTheme();
+                calculate();
+                loadHistory();
+            }
+
+            init();
+
+            console.log('🚀 EarnTrack ready!');
+            console.log('   💡 Tips:');
+            console.log('   - Ctrl+Enter to save');
+            console.log('   - Ctrl+R to reset fields');
+            console.log('   - Click ✏️ Edit on any entry to modify it');
+            console.log('   - Click 📥 to export all data as CSV');
+            console.log('   - Click 🌓 to toggle dark mode');
+        })();
+    </script>
+</body>
+</html>
